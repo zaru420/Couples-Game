@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaron</title>
+</head>
+<body>
+    <!--  -->
+    <div class="container"> <!-- Contenedor principal -->
+        <h2> Memory Game </h2> <!-- Título del juego -->
+        <!-- Añade esto en tu HTML donde quieras mostrar el número de intentos -->
+        <h3 id="attempts">Intentos: 0</h3> <!-- Muestra el número de intentos -->
+        <div class="game"></div> <!-- Añade un contenedor para el juego -->
+        <button class="button reset" onclick="resetGame()">Reset Game</button> <!-- Añade un botón para reiniciar el juego -->
+    </div>
+
+    <style>
+        body { /* Estilos para la donde va el juego */
+            display: flex; /* Usa flexbox para el diseño */
+            justify-content: center; /* Centra los elementos horizontalmente */
+            align-items: center; /* Centra los elementos verticalmente */
+            background-color: aquamarine; /* Color de fondo del cuerpo */
+            min-height: 50vh; /* Altura mínima del cuerpo, 50% de la altura de la ventana */
+            margin: 0; /* Margen del cuerpo */
+        }
+        .container { /* Estilos para el contenedor donde estan las cartas */
+            background-color: cyan; /* Color de fondo del contenedor */
+            display: flex; /* Usa flexbox para el diseño */
+            flex-direction: column; /* Los elementos se apilan verticalmente */
+            align-items: center; /* Centra los elementos horizontalmente */
+            padding: 40px 60px; /* Relleno del contenedor, 40px arriba y abajo, 60px a los lados */
+            gap: 30px; /* Espacio entre elementos */
+        }
+        button { /* Estilos para el botón de RESET GAME */
+            padding: 20px; /* Relleno del botón */
+            color: #267c65; /* Color del texto del botón */
+            background-color: white; /* Color de fondo del botón */
+            border: none; /* Sin borde */
+            font-size: 1.2em; /* Tamaño de la fuente */
+            letter-spacing: 0.1em; /* Espacio entre letras */
+            text-transform: uppercase; /* Transforma el texto a mayúsculas */
+            font-weight: bold; /* Peso de la fuente, en este caso es negrita */
+            cursor: pointer; /* Cambia el cursor a un puntero cuando se pasa sobre el botón */
+        }
+        h2 {
+            text-align: center; /* Alinea el texto al centro */
+            color: white; /* Color del texto */
+            font-size: 3em; /* Tamaño de la fuente */
+            letter-spacing: 0.1em; /* Espacio entre letras */
+            text-transform: uppercase; /* Transforma el texto a mayúsculas */
+            font-family: "monospace"; /* Tipo de fuente */
+        }
+        .game { /* Estilos para el juego */
+            width: 100%; /* Cambia el ancho a 100% para que sea responsive */
+            height: auto; /* Cambia el alto a auto para que se ajuste al contenido */
+            flex-direction: column; /* Cambia la dirección de los elementos a columna */
+            align-items: stretch; /* Asegura que los elementos se estiren para llenar el contenedor */
+            display: flex; /* Usa flexbox para el diseño */
+            flex-wrap: wrap; /* Permite que los elementos se envuelvan a la siguiente línea */
+            justify-content: center; /* Centra los elementos horizontalmente */
+            gap: 10px; /* Espacio entre elementos */
+            perspective: 500px; /* Establece la perspectiva para las transformaciones 3D */
+        }
+        .item { /* Estilos para cada carta */
+            position: relative; /* Posicionamiento relativo */
+            width: 100%; /* Cambia el ancho a 100% para que sea responsive */
+            height: auto; /* Cambia el alto a auto para que se ajuste al contenido */
+            display: flex; /* Usa flexbox para el diseño */
+            justify-content: center; /* Centra el contenido horizontalmente */
+            align-items: center; /* Centra el contenido verticalmente */
+            font-size: 2em; /* Tamaño de la fuente */
+            background-color: #fff; /* Color de fondo de la carta */
+            transition: transform 1s, opacity 1s; /* Transiciones para la transformación y la opacidad */
+            transform: rotateY(180deg); /* Rota la carta en el eje Y */
+            opacity: 0.9; /* Opacidad de la carta (En 1  no te deja, da error, pero es lo mismo 0.9) */
+            transform-style: preserve-3d; /* Establece el estilo de transformación 3D */
+            transition: transform 0.6s; /* Transición para la transformación */
+            background-size: cover; /* La imagen de fondo cubre todo el elemento */
+        }
+        .item img {    /* Estilos para las imágenes de las cartas */
+            position: absolute;   /* Posicionamiento absoluto */
+            width: 100%;    /* Ancho completo de la imagen */
+            height: 100%;   /* Altura completa de la imagen */
+            backface-visibility: hidden;    /* Oculta la parte trasera de la imagen */
+            object-fit: cover;  /* Asegura que la imagen cubra todo el espacio disponible */
+        }
+        .item .front {  /* Estilos para la cara frontal de la carta */
+            transform: rotateY(180deg);   /* Rota la cara frontal en el eje Y */
+        }
+        .item.boxOpen {   /* Estilos para las cartas destapadas */
+            transform: rotateY(180deg);  /* Rota la carta a su posición original en el eje Y */
+
+        }
+        @media screen and (min-width: 600px) { /* Media query para pantallas más grandes*/
+            .game {
+                flex-direction: row; /* Cambia la dirección de los elementos a fila para pantallas más grandes */
+                flex-wrap: wrap; /* Permite que los elementos se envuelvan a la siguiente línea */
+            }
+        
+            .item {
+                width: 20%; /* Cambia el ancho a 20% para pantallas más grandes */
+                height: 80px; /* Cambia el alto a 80px para pantallas más grandes */
+            }
+        }
+        
+        .boxOpen { /* Estilos para las cartas destapadas */
+            transform: rotateY(0deg); /* Rota la carta a su posición original en el eje Y */
+            opacity: 1; /* Opacidad completa de la carta */
+        }
+        .reset { /* Estilos para el RESET GAME */
+            color: #209d7b; /* Color del texto */
+            background-color: #fff; /* Color de fondo del elemento */
+        }
+        .reset:hover { /* Estilos para el botón de RESET GAME cuando se pasa el cursor sobre él */
+            cursor: pointer; /* Cambia el cursor a un puntero cuando se pasa sobre el elemento */
+            color: #fff; /* Color del texto cuando se pasa el cursor sobre el elemento con la clase .reset */
+            background-color: #209d7b; /* Color de fondo cuando se pasa el cursor sobre el elemento con la clase .reset */
+        }
+        .item img { /* Estilos para las imágenes de las cartas */
+            width: 100%; /* Ancho completo de la imagen */
+            height: 100%; /* Altura completa de la imagen */
+            object-fit: cover; /* Asegura que la imagen cubra todo el espacio disponible */
+        }
+    
+    </style>
+
+
+    <script>
+        // Array de imagenes, que le he dejado el nombre anterior de emojis
+        const emojis = [
+        "https://acortar.link/Al58A0", "https://acortar.link/Al58A0",
+        "https://acortar.link/DliUMr", "https://acortar.link/DliUMr", 
+        "https://acortar.link/jijfPY", "https://acortar.link/jijfPY", 
+        "https://acortar.link/bA7TO1", "https://acortar.link/bA7TO1",
+        "https://acortar.link/wRAoCp", "https://acortar.link/wRAoCp", 
+        "https://acortar.link/Rpj8pf", "https://acortar.link/Rpj8pf", 
+        "https://acortar.link/4KAhbn", "https://acortar.link/4KAhbn", 
+        "https://acortar.link/t3SGG9", "https://acortar.link/t3SGG9",
+        "https://acortar.link/cxWhw7", "https://acortar.link/cxWhw7", 
+        "https://acortar.link/iYnpLE", "https://acortar.link/iYnpLE", 
+        "https://acortar.link/WTswJs", "https://acortar.link/WTswJs", 
+        "https://acortar.link/sQ4IO9", "https://acortar.link/sQ4IO9",
+        "https://acortar.link/bH2p4X", "https://acortar.link/bH2p4X", 
+        "https://acortar.link/v0rz6I", "https://acortar.link/v0rz6I",
+         "https://acortar.link/sZJYSX", "https://acortar.link/sZJYSX"
+         ];
+         const gameContainer = document.querySelector('.game'); // Seleccionar el contenedor del juego
+         var shuf_emojis = emojis.sort(() => Math.random() - 0.5); // Barajar emojis 
+         var lastTwo = []; // Array para almacenar las dos cartas seleccionadas
+         let attempts = 0; // Variable para almacenar el número de intentos
+     
+         shuf_emojis.forEach((emoji, index) => { // Crear y añadir los box 
+            var box = document.createElement('div'); // Crear un div para cada emoji
+            box.className = 'item '; // Añadir la clase 'item' a cada box
+    
+            var imgFront = document.createElement('img'); // Crear una etiqueta de imagen para la cara frontal
+            imgFront.src = emoji; // Añadir la URL de la imagen al atributo src de la etiqueta de imagen
+            imgFront.className = 'front'; // Añadir la clase 'front' a la imagen frontal
+    
+            var imgBack = document.createElement('img'); // Crear una etiqueta de imagen para la cara trasera
+            imgBack.src = 'https://acortar.link/oMuvjO'; // Añadir la URL de la imagen de la parte trasera al atributo src de la etiqueta de imagen
+            imgBack.className = 'back'; // Añadir la clase 'back' a la imagen trasera
+    
+            box.appendChild(imgFront); // Añadir la etiqueta de imagen frontal al box
+            box.appendChild(imgBack); // Añadir la etiqueta de imagen trasera al box
+     
+    
+
+
+
+
+                                    // Añadir un evento de clic a cada box
+                  
+                box.onclick = function() {
+                    
+                    this.classList.toggle('boxOpen');// Alternar la clase 'boxOpen' en cada box
+                    lastTwo.push(this);// Añadir la caja seleccionada al array lastTwo
+                    if (lastTwo.length == 2) {// Comprobar si se han seleccionado dos cartas
+                        incrementAttempts();// Incrementa los intentos aquí
+                        if (lastTwo[0].innerHTML != lastTwo[1].innerHTML) {// Comprobar si los emojis de las dos cartas son diferentes
+                            setTimeout(() => {// Si los emojis son diferentes, espera 1 segundo y luego oculta las cartas
+                                lastTwo[0].classList.toggle('boxOpen');// Oculta la primera carta
+                                lastTwo[1].classList.toggle('boxOpen');// Oculta la segunda carta
+                                lastTwo = [];// Vacía el array lastTwo
+                            }, 1000);// Espera 1 segundo
+                        } else {// Si los emojis son iguales
+                            lastTwo = []; 
+                            checkWin();// Comprueba si el jugador ha ganado
+                        }
+                    }
+                };
+            
+                gameContainer.appendChild(box);// Añadir el box al contenedor del juego
+                });
+                
+                                                                          // Añadimos la nueva funcion checkWin
+                function checkWin() {// Comprueba si el jugador ha ganado
+                    const openBoxes = document.querySelectorAll('.boxOpen');// Selecciona todas las cajas abiertas
+                    if (openBoxes.length == emojis.length) {// Si el número de cajas abiertas es igual al número de emojis
+                        alert("WIN");// Muestra un mensaje de alerta de que ha ganado
+                    }
+                } 
+
+                function anima() {// Función para animar las cartas
+                    const boxes = document.querySelectorAll('.item');// Selecciona todas las cajas
+                    boxes.forEach(box => {// Añade un evento de clic a cada caja
+                        box.classList.toggle('boxOpen');// Alterna la clase 'boxOpen' en cada caja
+                    });
+                }
+                
+                
+                function incrementAttempts() {// Función para incrementar los intentos
+                    attempts++;// Incrementa los intentos
+                    document.getElementById('attempts').innerText = 'Intentos: ' + attempts;// Actualiza el número de intentos en el HTML
+                }
+
+                function selectCard() {// Función para seleccionar una carta
+
+                    if (selectedCards.length == 2) {// Comprueba si ya se han seleccionado dos cartas
+                        incrementAttempts();// Incrementa los intentos
+                    }
+                }
+
+                function resetGame() {// Función para resetear el juego
+                    window.location.reload();// Recarga la página
+                    attempts = 0;// Resetea el número de intentos
+                    document.getElementById('attempts').innerText = 'Intentos: 0';// Actualiza el número de intentos en el HTML
+                }
+                window.onload = function() {// Cuando la ventana se carga    
+                    const boxes = document.querySelectorAll('.item');// Selecciona todas las cajas
+                
+
+                    boxes.forEach(box => box.classList.add('boxOpen'));// Añade la clase 'boxOpen' a todas las cajas
+                
+                    
+                    // Después de 3 segundos, elimina la clase 'boxOpen' para ocultarlos
+
+                    setTimeout(() => {
+                        boxes.forEach(box => box.classList.remove('boxOpen'));// Elimina la clase 'boxOpen' de todas las cajas
+                    }, 3000);// Espera 3 segundos
+                };
+    </script>
+    
+
+</body>
+</html>
